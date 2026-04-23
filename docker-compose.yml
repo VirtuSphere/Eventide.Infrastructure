@@ -1,0 +1,150 @@
+version: '3.8'
+
+services:
+  # ====== БАЗЫ ДАННЫХ ======
+  
+  auth-db:
+    image: postgres:16-alpine
+    container_name: eventide-auth-db
+    environment:
+      POSTGRES_DB: eventide_auth
+      POSTGRES_USER: eventide
+      POSTGRES_PASSWORD: eventide_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eventide -d eventide_auth"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  user-db:
+    image: postgres:16-alpine
+    container_name: eventide-user-db
+    environment:
+      POSTGRES_DB: eventide_user
+      POSTGRES_USER: eventide
+      POSTGRES_PASSWORD: eventide_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - user-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eventide -d eventide_user"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  tournament-db:
+    image: postgres:16-alpine
+    container_name: eventide-tournament-db
+    environment:
+      POSTGRES_DB: eventide_tournament
+      POSTGRES_USER: eventide
+      POSTGRES_PASSWORD: eventide_pass
+    ports:
+      - "5434:5432"
+    volumes:
+      - tournament-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eventide -d eventide_tournament"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  bracket-db:
+    image: postgres:16-alpine
+    container_name: eventide-bracket-db
+    environment:
+      POSTGRES_DB: eventide_bracket
+      POSTGRES_USER: eventide
+      POSTGRES_PASSWORD: eventide_pass
+    ports:
+      - "5435:5432"
+    volumes:
+      - bracket-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eventide -d eventide_bracket"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  match-db:
+    image: postgres:16-alpine
+    container_name: eventide-match-db
+    environment:
+      POSTGRES_DB: eventide_match
+      POSTGRES_USER: eventide
+      POSTGRES_PASSWORD: eventide_pass
+    ports:
+      - "5436:5432"
+    volumes:
+      - match-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eventide -d eventide_match"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  notification-db:
+    image: postgres:16-alpine
+    container_name: eventide-notification-db
+    environment:
+      POSTGRES_DB: eventide_notification
+      POSTGRES_USER: eventide
+      POSTGRES_PASSWORD: eventide_pass
+    ports:
+      - "5437:5432"
+    volumes:
+      - notification-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eventide -d eventide_notification"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ====== КЭШ ======
+  
+  redis:
+    image: redis:7-alpine
+    container_name: eventide-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ====== ОЧЕРЕДЬ ======
+  
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: eventide-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: eventide
+      RABBITMQ_DEFAULT_PASS: eventide_pass
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  auth-db-data:
+  user-db-data:
+  tournament-db-data:
+  bracket-db-data:
+  match-db-data:
+  notification-db-data:
+  redis-data:
+  rabbitmq-data:
